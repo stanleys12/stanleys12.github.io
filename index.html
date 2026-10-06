@@ -814,7 +814,7 @@ footer{display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;font:5
     const setBtn = () => { pbtn.textContent = playing ? '❚❚' : '▶'; pbtn.title = playing ? 'Pause' : 'Play the story'; pbtn.setAttribute('aria-label', playing ? 'Pause the story' : 'Play the story'); pbtn.setAttribute('aria-pressed', String(!playing)); scene.classList.toggle('paused', !playing); };
     if ('IntersectionObserver' in window) new IntersectionObserver((es) => es.forEach((x) => { onScreen = x.isIntersecting; }), { threshold: .15 }).observe(scene);
     const frame = (ts) => { const dt = last == null ? 0 : Math.min(.05, (ts - last) / 1000); last = ts;
-      if (playing && onScreen && !document.hidden) { T += dt; if (T >= TOTAL) T = 0; render(T, dt); }
+      if (playing && onScreen && !document.hidden) { T += dt; window.__storyMax = Math.max(window.__storyMax || 0, T); window.__storyTotal = TOTAL; if (T >= TOTAL) T = 0; render(T, dt); }
       requestAnimationFrame(frame); };
     pbtn.addEventListener('click', () => { playing = !playing; setBtn(); });
     rbtn.addEventListener('click', () => { T = 0; render(0, 0); if (!playing) { playing = true; setBtn(); } });
@@ -847,6 +847,22 @@ footer{display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;font:5
   if (ls.getItem('sv-me')) return;
   fetch(base + 'visits').catch(() => {});
   if (!ls.getItem('sv-seen')) { ls.setItem('sv-seen', '1'); fetch(base + 'visitors').catch(() => {}); }
+  // time on the page (only while it is actually in front of them) and how far into the story they got — recorded once,
+  // the first time they leave or switch away
+  let active = 0, since = document.visibilityState === 'visible' ? performance.now() : null, sent = false;
+  const bucket = (s) => s < 10 ? 'time-0-10s' : s < 30 ? 'time-10-30s' : s < 60 ? 'time-30-60s' : s < 180 ? 'time-1-3m' : s < 360 ? 'time-3-6m' : 'time-6m-plus';
+  const send = () => {
+    if (since != null) { active += performance.now() - since; since = null; }
+    if (sent) return; sent = true;
+    const hit = (k) => fetch(base + k, { keepalive: true }).catch(() => {});
+    hit(bucket(active / 1000));
+    const watched = window.__storyMax || 0, total = window.__storyTotal || 350;
+    if (watched >= 10) hit('story-started');
+    if (watched >= total / 2) hit('story-half');
+    if (watched >= total * .95) hit('story-finished');
+  };
+  document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'hidden') send(); else if (since == null) since = performance.now(); });
+  addEventListener('pagehide', send);
 } catch (e) {} })();
 </script>
 </body>
