@@ -838,5 +838,16 @@ footer{display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;font:5
 })();
 </script>
 
+<script>
+// visitor counter (Abacus, no cookies): "visits" = every page load, "visitors" = each browser once.
+// Stanley's own browser is excluded: open https://stanleys12.github.io/?me once to mark it.
+(() => { try {
+  const ls = window.localStorage, base = 'https://abacus.jasoncameron.dev/hit/stanleys12-github-io/';
+  if (/[?&]me\b/.test(location.search)) ls.setItem('sv-me', '1');
+  if (ls.getItem('sv-me')) return;
+  fetch(base + 'visits').catch(() => {});
+  if (!ls.getItem('sv-seen')) { ls.setItem('sv-seen', '1'); fetch(base + 'visitors').catch(() => {}); }
+} catch (e) {} })();
+</script>
 </body>
 </html>

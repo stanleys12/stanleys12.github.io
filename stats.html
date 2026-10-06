@@ -1,0 +1,49 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex,nofollow">
+<title>Portfolio Visitors</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Shantell+Sans:wght@600;800&family=Figtree:wght@400;600&display=swap">
+<style>
+:root{--page:#F4F6FA;--sheet:#fff;--ink:#1F2A44;--ink-2:#56607A;--coral:#F2665A;--teal:#1FA393;--rule:#D9DFEA;color-scheme:light}
+@media (prefers-color-scheme:dark){:root{--page:#2B3447;--sheet:#36405A;--ink:#F3F6FB;--ink-2:#C9D1E0;--coral:#FF8C80;--teal:#5AD3C2;--rule:#4A5570;color-scheme:dark}}
+body{margin:0;background:var(--page);color:var(--ink);font:400 17px/1.6 Figtree,system-ui,sans-serif;padding-inline:16px;padding-block:48px}
+.wrap{max-width:640px;margin:0 auto}
+h1{font:800 34px/1.1 "Shantell Sans",cursive;margin:0 0 6px}
+p{color:var(--ink-2);margin:0 0 28px}
+.cards{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:18px}
+.card{background:var(--sheet);border-radius:8px;padding:20px;box-shadow:0 12px 28px -18px rgba(31,42,68,.45)}
+.card b{display:block;font:800 46px/1 "Shantell Sans",cursive;color:var(--coral);font-variant-numeric:tabular-nums}
+.card:nth-child(2) b{color:var(--teal)}
+.card span{display:block;margin-top:8px;color:var(--ink-2);font-size:15px}
+.foot{margin-top:24px;font-size:14px;color:var(--ink-2)}
+a{color:var(--ink)}
+@media (max-width:480px){.cards{grid-template-columns:minmax(0,1fr)}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>Portfolio visitors</h1>
+  <p>Counts for <a href="https://stanleys12.github.io">stanleys12.github.io</a>. Your own browser is left out once you've opened the site with <code>?me</code>.</p>
+  <div class="cards">
+    <div class="card"><b id="visitors">…</b><span>visitors<br>(each browser counted once)</span></div>
+    <div class="card"><b id="visits">…</b><span>visits<br>(every time the page is opened)</span></div>
+  </div>
+  <div class="foot" id="foot">Loading…</div>
+</div>
+<script>
+const base = 'https://abacus.jasoncameron.dev/get/stanleys12-github-io/';
+async function load() {
+  try {
+    const [a, b] = await Promise.all(['visitors', 'visits'].map((k) => fetch(base + k).then((r) => r.json())));
+    document.getElementById('visitors').textContent = (a.value ?? 0).toLocaleString();
+    document.getElementById('visits').textContent = (b.value ?? 0).toLocaleString();
+    document.getElementById('foot').textContent = 'Updated ' + new Date().toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' }) + ' · refreshes every minute';
+  } catch (e) { document.getElementById('foot').textContent = 'Could not reach the counter right now. Try again in a minute.'; }
+}
+load(); setInterval(load, 60000);
+</script>
+</body>
+</html>
