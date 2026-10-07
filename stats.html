@@ -5,42 +5,75 @@
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <meta name="robots" content="noindex,nofollow">
 <title>Portfolio Visitors</title>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Shantell+Sans:wght@600;800&family=Figtree:wght@400;600&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Shantell+Sans:wght@600;800&family=Figtree:wght@400;600;700&display=swap">
 <style>
 :root{--page:#F4F6FA;--sheet:#fff;--ink:#1F2A44;--ink-2:#56607A;--coral:#F2665A;--teal:#1FA393;--rule:#D9DFEA;color-scheme:light}
 @media (prefers-color-scheme:dark){:root{--page:#2B3447;--sheet:#36405A;--ink:#F3F6FB;--ink-2:#C9D1E0;--coral:#FF8C80;--teal:#5AD3C2;--rule:#4A5570;color-scheme:dark}}
-body{margin:0;background:var(--page);color:var(--ink);font:400 17px/1.6 Figtree,system-ui,sans-serif;padding-inline:16px;padding-block:48px}
-.wrap{max-width:640px;margin:0 auto}
+body{margin:0;background:var(--page);color:var(--ink);font:400 17px/1.6 Figtree,system-ui,sans-serif;padding-inline:16px;padding-block:44px}
+.wrap{max-width:680px;margin:0 auto}
 h1{font:800 34px/1.1 "Shantell Sans",cursive;margin:0 0 6px}
-p{color:var(--ink-2);margin:0 0 28px}
-.cards{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:18px}
-.card{background:var(--sheet);border-radius:8px;padding:20px;box-shadow:0 12px 28px -18px rgba(31,42,68,.45)}
-.card b{display:block;font:800 46px/1 "Shantell Sans",cursive;color:var(--coral);font-variant-numeric:tabular-nums}
-.card:nth-child(2) b{color:var(--teal)}
-.card span{display:block;margin-top:8px;color:var(--ink-2);font-size:15px}
-.foot{margin-top:24px;font-size:14px;color:var(--ink-2)}
+h2{font:800 22px/1.2 "Shantell Sans",cursive;margin:34px 0 4px}
+p{color:var(--ink-2);margin:0 0 20px}
+.cards{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px}
+.card{background:var(--sheet);border-radius:8px;padding:18px;box-shadow:0 12px 28px -18px rgba(31,42,68,.45);min-width:0}
+.card b{display:block;font:800 40px/1 "Shantell Sans",cursive;color:var(--coral);font-variant-numeric:tabular-nums}
+.card:nth-child(2) b{color:var(--teal)}.card:nth-child(3) b{color:var(--ink)}
+.card span{display:block;margin-top:8px;color:var(--ink-2);font-size:14.5px;line-height:1.4}
+.bars{display:grid;gap:9px;background:var(--sheet);border-radius:8px;padding:18px;box-shadow:0 12px 28px -18px rgba(31,42,68,.45)}
+.row{display:grid;grid-template-columns:96px minmax(0,1fr) 56px;gap:12px;align-items:center;font-size:15px}
+.row .l{color:var(--ink-2)}
+.row .t{height:16px;border-radius:999px;background:color-mix(in srgb,var(--ink) 7%,transparent);overflow:hidden}
+.row .f{display:block;height:100%;border-radius:999px;background:var(--teal);transition:width .6s}
+.row .n{text-align:right;font-weight:700;font-variant-numeric:tabular-nums}
+.funnel .f{background:var(--coral)}
+.note{font-size:14px;color:var(--ink-2);margin-top:10px}
+.foot{margin-top:26px;font-size:14px;color:var(--ink-2)}
 a{color:var(--ink)}
-@media (max-width:480px){.cards{grid-template-columns:minmax(0,1fr)}}
+@media (max-width:520px){.cards{grid-template-columns:minmax(0,1fr)}.row{grid-template-columns:78px minmax(0,1fr) 46px}}
 </style>
 </head>
 <body>
 <div class="wrap">
   <h1>Portfolio visitors</h1>
-  <p>Counts for <a href="https://stanleys12.github.io">stanleys12.github.io</a>. Your own browser is left out once you've opened the site with <code>?me</code>.</p>
+  <p>For <a href="https://stanleys12.github.io">stanleys12.github.io</a>. Your own browsers are left out once you've opened the site with <code>?me</code>.</p>
   <div class="cards">
-    <div class="card"><b id="visitors">…</b><span>visitors<br>(each browser counted once)</span></div>
-    <div class="card"><b id="visits">…</b><span>visits<br>(every time the page is opened)</span></div>
+    <div class="card"><b id="visitors">…</b><span>visitors<br>(each browser once)</span></div>
+    <div class="card"><b id="visits">…</b><span>visits<br>(every page open)</span></div>
+    <div class="card"><b id="avg">…</b><span>average time on site<br>(estimated)</span></div>
   </div>
+
+  <h2>How long people stay</h2>
+  <p>Time the page was actually in front of them, recorded when they leave or switch away.</p>
+  <div class="bars" id="timeBars"></div>
+
+  <h2>How far they watch the story</h2>
+  <p>“The Letter” at the top of the page runs about six minutes.</p>
+  <div class="bars funnel" id="storyBars"></div>
+  <div class="note" id="storyNote"></div>
+
   <div class="foot" id="foot">Loading…</div>
 </div>
 <script>
 const base = 'https://abacus.jasoncameron.dev/get/stanleys12-github-io/';
+const TIME = [['time-0-10s', 'under 10 s', 5], ['time-10-30s', '10–30 s', 20], ['time-30-60s', '30–60 s', 45], ['time-1-3m', '1–3 min', 120], ['time-3-6m', '3–6 min', 270], ['time-6m-plus', '6+ min', 420]];
+const STORY = [['story-started', 'started'], ['story-half', 'past halfway'], ['story-finished', 'to the end']];
+const get = (k) => fetch(base + k).then((r) => r.ok ? r.json() : { value: 0 }).then((d) => d.value || 0).catch(() => 0);
+const esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+const bars = (rows, top) => rows.map(([label, n]) => `<div class="row"><span class="l">${esc(label)}</span><span class="t"><span class="f" style="width:${top ? (100 * n / top).toFixed(1) : 0}%"></span></span><span class="n">${n.toLocaleString()}</span></div>`).join('');
+const fmtDur = (s) => s < 60 ? Math.round(s) + ' s' : Math.floor(s / 60) + ' min ' + String(Math.round(s % 60)).padStart(2, '0') + ' s';
 async function load() {
   try {
-    const [a, b] = await Promise.all(['visitors', 'visits'].map((k) => fetch(base + k).then((r) => r.json())));
-    document.getElementById('visitors').textContent = (a.value ?? 0).toLocaleString();
-    document.getElementById('visits').textContent = (b.value ?? 0).toLocaleString();
-    document.getElementById('foot').textContent = 'Updated ' + new Date().toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' }) + ' · refreshes every minute';
+    const keys = ['visitors', 'visits', ...TIME.map((t) => t[0]), ...STORY.map((t) => t[0])];
+    const v = Object.fromEntries(await Promise.all(keys.map(async (k) => [k, await get(k)])));
+    document.getElementById('visitors').textContent = v.visitors.toLocaleString();
+    document.getElementById('visits').textContent = v.visits.toLocaleString();
+    const timed = TIME.reduce((a, t) => a + v[t[0]], 0);
+    document.getElementById('avg').textContent = timed ? fmtDur(TIME.reduce((a, t) => a + v[t[0]] * t[2], 0) / timed) : '–';
+    document.getElementById('timeBars').innerHTML = timed ? bars(TIME.map((t) => [t[1], v[t[0]]]), Math.max(...TIME.map((t) => v[t[0]]))) : '<span class="l">No timed visits yet.</span>';
+    const sv = v.visits || 1;
+    document.getElementById('storyBars').innerHTML = bars(STORY.map((t) => [t[1], v[t[0]]]), Math.max(sv, ...STORY.map((t) => v[t[0]])));
+    document.getElementById('storyNote').textContent = v.visits ? `${Math.round(100 * v['story-started'] / sv)}% of visits started the story · ${Math.round(100 * v['story-finished'] / sv)}% watched it to the end` : '';
+    document.getElementById('foot').textContent = 'Updated ' + new Date().toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' }) + ' · refreshes every minute · the average is estimated from the middle of each time range';
   } catch (e) { document.getElementById('foot').textContent = 'Could not reach the counter right now. Try again in a minute.'; }
 }
 load(); setInterval(load, 60000);
